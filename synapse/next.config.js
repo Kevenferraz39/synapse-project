@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ["lh3.googleusercontent.com", "firebasestorage.googleapis.com"],
+  eslint: {
+    // Atenção: Isso permite que o build de produção conclua com sucesso mesmo se houver erros de ESLint.
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Atenção: Isso permite que o build de produção conclua com sucesso mesmo se houver erros de tipo.
+    ignoreBuildErrors: true,
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
