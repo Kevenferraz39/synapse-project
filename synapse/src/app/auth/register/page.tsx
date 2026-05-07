@@ -48,7 +48,13 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
     try {
-      await registerWithEmail(email, password, name);
+      await registerWithEmail(email, password, name, {
+        university,
+        course,
+        semester,
+        subjects: selectedSubjects,
+        studySchedule: schedule,
+      });
       router.push("/dashboard");
     } catch (err: any) {
       if (err?.code === "auth/email-already-in-use") {
@@ -79,42 +85,25 @@ export default function RegisterPage() {
 
   return (
     <div className="animate-fade-up">
-      {/* Mobile logo */}
       <div className="flex items-center gap-3 mb-6 lg:hidden">
-        <div className="w-10 h-10 rounded-xl bg-gradient-main flex items-center justify-center text-lg font-black text-white">
-          S
-        </div>
+        <div className="w-10 h-10 rounded-xl bg-gradient-main flex items-center justify-center text-lg font-black text-white">S</div>
         <span className="text-xl font-black">Synapse</span>
       </div>
 
-      {/* Progress bar */}
       <div className="flex gap-2 mb-8">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex-1 h-1.5 rounded-full overflow-hidden bg-white/10">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: step >= s ? "100%" : "0%",
-                background: "linear-gradient(135deg, #FF6200, #F7145E, #8C52FF)",
-              }}
-            />
+            <div className="h-full rounded-full transition-all duration-500" style={{ width: step >= s ? "100%" : "0%", background: "linear-gradient(135deg, #FF6200, #F7145E, #8C52FF)" }} />
           </div>
         ))}
       </div>
 
-      {/* Step 1: Account */}
       {step === 1 && (
         <div className="animate-fade-up">
           <h1 className="text-3xl font-bold mb-2">Criar conta</h1>
-          <p className="text-text-secondary mb-8">
-            Comece sua jornada de estudo colaborativo
-          </p>
+          <p className="text-text-secondary mb-8">Comece sua jornada de estudo colaborativo</p>
 
-          <button
-            onClick={handleGoogleRegister}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-text-primary font-medium text-sm hover:bg-white/[0.06] hover:border-white/20 transition-all duration-300 disabled:opacity-50 mb-6"
-          >
+          <button onClick={handleGoogleRegister} disabled={loading} className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-text-primary font-medium text-sm hover:bg-white/[0.06] hover:border-white/20 transition-all duration-300 disabled:opacity-50 mb-6">
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -143,38 +132,21 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium text-text-secondary mb-1.5">Senha</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required minLength={6} className="input-field" />
             </div>
-
-            {error && (
-              <div className="px-4 py-3 rounded-xl bg-brand-pink/10 border border-brand-pink/20 text-brand-pink text-sm">{error}</div>
-            )}
-
-            <button
-              onClick={() => {
-                if (name && email && password.length >= 6) setStep(2);
-                else setError("Preencha todos os campos corretamente.");
-              }}
-              className="w-full btn-gradient py-3.5 text-sm"
-            >
-              Continuar →
-            </button>
+            {error && <div className="px-4 py-3 rounded-xl bg-brand-pink/10 border border-brand-pink/20 text-brand-pink text-sm">{error}</div>}
+            <button onClick={() => { if (name && email && password.length >= 6) { setError(""); setStep(2); } else setError("Preencha todos os campos corretamente."); }} className="w-full btn-gradient py-3.5 text-sm">Continuar →</button>
           </div>
 
           <p className="text-center text-sm text-text-muted mt-6">
             Já tem uma conta?{" "}
-            <Link href="/auth/login" className="text-brand-purple hover:text-brand-mint font-medium transition-colors">
-              Entrar
-            </Link>
+            <Link href="/auth/login" className="text-brand-purple hover:text-brand-mint font-medium transition-colors">Entrar</Link>
           </p>
         </div>
       )}
 
-      {/* Step 2: University Info */}
       {step === 2 && (
         <div className="animate-fade-up">
           <h1 className="text-3xl font-bold mb-2">Sobre você</h1>
-          <p className="text-text-secondary mb-8">
-            Isso nos ajuda a encontrar os melhores parceiros de estudo
-          </p>
+          <p className="text-text-secondary mb-8">Isso nos ajuda a encontrar os melhores parceiros de estudo</p>
 
           <div className="space-y-4">
             <div>
@@ -188,136 +160,68 @@ export default function RegisterPage() {
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-1.5">Semestre atual</label>
               <div className="flex gap-2 flex-wrap">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSemester(s)}
-                    className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                      semester === s
-                        ? "bg-brand-purple text-white"
-                        : "bg-white/[0.04] border border-white/10 text-text-secondary hover:border-brand-purple/40"
-                    }`}
-                  >
-                    {s}º
-                  </button>
+                {[1,2,3,4,5,6,7,8,9,10].map((s) => (
+                  <button key={s} onClick={() => setSemester(s)} className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all duration-200 ${semester === s ? "bg-brand-purple text-white" : "bg-white/[0.04] border border-white/10 text-text-secondary hover:border-brand-purple/40"}`}>{s}º</button>
                 ))}
               </div>
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">
-                Matérias de interesse <span className="text-text-muted">({selectedSubjects.length}/8)</span>
-              </label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Matérias de interesse <span className="text-text-muted">({selectedSubjects.length}/8)</span></label>
               <div className="flex flex-wrap gap-2">
                 {SUBJECTS.map((subject) => (
-                  <button
-                    key={subject}
-                    onClick={() => toggleSubject(subject)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                      selectedSubjects.includes(subject)
-                        ? "bg-brand-purple text-white"
-                        : "bg-white/[0.04] border border-white/10 text-text-secondary hover:border-brand-purple/40"
-                    }`}
-                  >
-                    {subject}
-                  </button>
+                  <button key={subject} onClick={() => toggleSubject(subject)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${selectedSubjects.includes(subject) ? "bg-brand-purple text-white" : "bg-white/[0.04] border border-white/10 text-text-secondary hover:border-brand-purple/40"}`}>{subject}</button>
                 ))}
               </div>
             </div>
-
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setStep(1)} className="btn-ghost py-3 px-6 text-sm">
-                ← Voltar
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                className="flex-1 btn-gradient py-3.5 text-sm"
-              >
-                Continuar →
-              </button>
+              <button onClick={() => setStep(1)} className="btn-ghost py-3 px-6 text-sm">← Voltar</button>
+              <button onClick={() => setStep(3)} className="flex-1 btn-gradient py-3.5 text-sm">Continuar →</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Step 3: Schedule */}
       {step === 3 && (
         <div className="animate-fade-up">
           <h1 className="text-3xl font-bold mb-2">Seus horários</h1>
-          <p className="text-text-secondary mb-8">
-            Quando você costuma estudar? Isso melhora o match.
-          </p>
+          <p className="text-text-secondary mb-8">Quando você costuma estudar? Isso melhora o match.</p>
 
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-3">Turnos preferidos</label>
               <div className="grid grid-cols-2 gap-3">
-                {[
+                {([
                   { key: "morning" as const, label: "🌅 Manhã", desc: "6h — 12h" },
                   { key: "afternoon" as const, label: "☀️ Tarde", desc: "12h — 18h" },
                   { key: "evening" as const, label: "🌆 Noite", desc: "18h — 22h" },
                   { key: "night" as const, label: "🌙 Madrugada", desc: "22h — 2h" },
-                ].map(({ key, label, desc }) => (
-                  <button
-                    key={key}
-                    onClick={() => toggleSchedule(key)}
-                    className={`p-4 rounded-xl text-left transition-all duration-200 border ${
-                      schedule[key]
-                        ? "bg-brand-purple/15 border-brand-purple/40 text-text-primary"
-                        : "bg-white/[0.03] border-white/10 text-text-secondary hover:border-white/20"
-                    }`}
-                  >
+                ]).map(({ key, label, desc }) => (
+                  <button key={key} onClick={() => toggleSchedule(key)} className={`p-4 rounded-xl text-left transition-all duration-200 border ${schedule[key] ? "bg-brand-purple/15 border-brand-purple/40 text-text-primary" : "bg-white/[0.03] border-white/10 text-text-secondary hover:border-white/20"}`}>
                     <div className="text-sm font-semibold">{label}</div>
                     <div className="text-xs text-text-muted mt-1">{desc}</div>
                   </button>
                 ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-3">Dias</label>
               <div className="grid grid-cols-2 gap-3">
-                {[
+                {([
                   { key: "weekdays" as const, label: "📅 Dias úteis", desc: "Seg — Sex" },
                   { key: "weekends" as const, label: "🎉 Fins de semana", desc: "Sáb — Dom" },
-                ].map(({ key, label, desc }) => (
-                  <button
-                    key={key}
-                    onClick={() => toggleSchedule(key)}
-                    className={`p-4 rounded-xl text-left transition-all duration-200 border ${
-                      schedule[key]
-                        ? "bg-brand-purple/15 border-brand-purple/40 text-text-primary"
-                        : "bg-white/[0.03] border-white/10 text-text-secondary hover:border-white/20"
-                    }`}
-                  >
+                ]).map(({ key, label, desc }) => (
+                  <button key={key} onClick={() => toggleSchedule(key)} className={`p-4 rounded-xl text-left transition-all duration-200 border ${schedule[key] ? "bg-brand-purple/15 border-brand-purple/40 text-text-primary" : "bg-white/[0.03] border-white/10 text-text-secondary hover:border-white/20"}`}>
                     <div className="text-sm font-semibold">{label}</div>
                     <div className="text-xs text-text-muted mt-1">{desc}</div>
                   </button>
                 ))}
               </div>
             </div>
-
-            {error && (
-              <div className="px-4 py-3 rounded-xl bg-brand-pink/10 border border-brand-pink/20 text-brand-pink text-sm">{error}</div>
-            )}
-
+            {error && <div className="px-4 py-3 rounded-xl bg-brand-pink/10 border border-brand-pink/20 text-brand-pink text-sm">{error}</div>}
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setStep(2)} className="btn-ghost py-3 px-6 text-sm">
-                ← Voltar
-              </button>
-              <button
-                onClick={handleRegister}
-                disabled={loading}
-                className="flex-1 btn-gradient py-3.5 text-sm disabled:opacity-50"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Criando conta...
-                  </span>
-                ) : (
-                  "Criar minha conta 🚀"
-                )}
+              <button onClick={() => setStep(2)} className="btn-ghost py-3 px-6 text-sm">← Voltar</button>
+              <button onClick={handleRegister} disabled={loading} className="flex-1 btn-gradient py-3.5 text-sm disabled:opacity-50">
+                {loading ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Criando conta...</span>) : "Criar minha conta 🚀"}
               </button>
             </div>
           </div>
